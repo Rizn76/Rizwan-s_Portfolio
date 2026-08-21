@@ -1,8 +1,24 @@
 import type { Metadata } from "next";
+import { Inter, Manrope } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { siteConfig } from "@/lib/siteConfig";
+
+// Load fonts via next/font — correct App Router pattern, no ESLint warnings
+const inter = Inter({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700", "800", "900"],
+  variable: "--font-inter",
+  display: "swap",
+});
+
+const manrope = Manrope({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700", "800"],
+  variable: "--font-manrope",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://mohammedrizwan.dev"), // PLACEHOLDER — replace with your actual domain
@@ -37,7 +53,7 @@ export const metadata: Metadata = {
       "AI/ML Engineer building Machine Learning, Generative AI, RAG, LLM-powered applications, semantic search, and intelligent data solutions.",
     images: [
       {
-        url: "/og-image.png", // PLACEHOLDER — add your Open Graph image
+        url: "/og-image.png",
         width: 1200,
         height: 630,
         alt: "Mohammed Rizwan — AI/ML Engineer Portfolio",
@@ -49,7 +65,7 @@ export const metadata: Metadata = {
     title: "Mohammed Rizwan | AI/ML Engineer",
     description:
       "AI/ML Engineer building Machine Learning, Generative AI, RAG, LLM-powered applications and intelligent data solutions.",
-    images: ["/og-image.png"], // PLACEHOLDER
+    images: ["/og-image.png"],
   },
   robots: {
     index: true,
@@ -70,18 +86,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="scroll-smooth">
+    <html lang="en" className={`scroll-smooth ${inter.variable} ${manrope.variable}`}>
       <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link
-          rel="preconnect"
-          href="https://fonts.gstatic.com"
-          crossOrigin="anonymous"
-        />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Manrope:wght@300;400;500;600;700;800&display=swap"
-          rel="stylesheet"
-        />
         {/* Structured data — Person schema */}
         <script
           type="application/ld+json"
@@ -95,10 +101,7 @@ export default function RootLayout({
                 "AI/ML Engineer building Machine Learning, Generative AI, RAG, and LLM-powered applications.",
               url: siteConfig.url,
               email: siteConfig.email,
-              sameAs: [
-                siteConfig.linkedin,
-                siteConfig.github,
-              ],
+              sameAs: [siteConfig.linkedin, siteConfig.github],
               knowsAbout: [
                 "Machine Learning",
                 "Generative AI",

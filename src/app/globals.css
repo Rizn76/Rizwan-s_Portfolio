@@ -1,0 +1,224 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Manrope:wght@300;400;500;600;700;800&display=swap');
+
+:root {
+  --font-inter: 'Inter', system-ui, sans-serif;
+  --font-manrope: 'Manrope', system-ui, sans-serif;
+}
+
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: #F7F5F2;
+    color: #111110;
+    font-family: var(--font-inter);
+    font-size: 1rem;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Reduce motion for accessibility */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
+  /* Focus visible styles */
+  :focus-visible {
+    outline: 2px solid #2563EB;
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  /* Selection color */
+  ::selection {
+    background-color: #DBEAFE;
+    color: #1e3a5f;
+  }
+}
+
+@layer components {
+  /* Container */
+  .container-portfolio {
+    @apply w-full max-w-7xl mx-auto px-6 md:px-10 lg:px-16;
+  }
+
+  /* Section spacing */
+  .section-spacing {
+    @apply py-20 md:py-28 lg:py-36;
+  }
+
+  /* Eyebrow label */
+  .eyebrow {
+    @apply text-xs font-semibold tracking-[0.2em] uppercase text-muted;
+  }
+
+  /* Large display headings */
+  .heading-display {
+    font-family: var(--font-manrope);
+    font-size: clamp(2.75rem, 7vw, 6rem);
+    font-weight: 800;
+    line-height: 1.02;
+    letter-spacing: -0.03em;
+    color: #111110;
+  }
+
+  .heading-xl {
+    font-family: var(--font-manrope);
+    font-size: clamp(2rem, 4.5vw, 4rem);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -0.025em;
+    color: #111110;
+  }
+
+  .heading-lg {
+    font-family: var(--font-manrope);
+    font-size: clamp(1.625rem, 3vw, 2.75rem);
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    color: #111110;
+  }
+
+  .heading-md {
+    font-family: var(--font-manrope);
+    font-size: clamp(1.25rem, 2vw, 1.875rem);
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.015em;
+    color: #111110;
+  }
+
+  /* Body text */
+  .body-lg {
+    @apply text-lg leading-relaxed text-muted;
+  }
+
+  .body-md {
+    @apply text-base leading-relaxed text-muted;
+  }
+
+  /* Divider */
+  .divider {
+    @apply border-t border-border;
+  }
+
+  /* Pill tags */
+  .tag {
+    @apply inline-flex items-center px-3 py-1 text-xs font-medium tracking-wide rounded-full bg-surface text-foreground border border-border;
+  }
+
+  /* Metric block */
+  .metric-value {
+    font-family: var(--font-manrope);
+    @apply text-4xl md:text-5xl font-bold tracking-tight text-foreground;
+  }
+
+  .metric-label {
+    @apply text-sm text-muted mt-1;
+  }
+
+  /* Animated underline link */
+  .link-underline {
+    @apply relative inline-flex items-center gap-1;
+  }
+
+  .link-underline::after {
+    content: '';
+    @apply absolute bottom-0 left-0 w-0 h-px bg-foreground transition-all duration-300;
+  }
+
+  .link-underline:hover::after {
+    @apply w-full;
+  }
+
+  /* Appear animation classes */
+  .appear {
+    @apply opacity-0 translate-y-6;
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+
+  .appear.visible {
+    @apply opacity-100 translate-y-0;
+  }
+
+  .appear-delay-1 { transition-delay: 0.1s; }
+  .appear-delay-2 { transition-delay: 0.2s; }
+  .appear-delay-3 { transition-delay: 0.3s; }
+  .appear-delay-4 { transition-delay: 0.4s; }
+  .appear-delay-5 { transition-delay: 0.5s; }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .text-pretty {
+    text-wrap: pretty;
+  }
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #F7F5F2;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #D1CDC8;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #9B9890;
+}
+
+/* Project card hover state */
+.project-card-inner {
+  transition: transform 0.4s cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+
+.project-card:hover .project-card-inner {
+  transform: translateY(-4px);
+}
+
+/* Smooth page transitions */
+.page-wrapper {
+  animation: pageIn 0.4s ease forwards;
+}
+
+@keyframes pageIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

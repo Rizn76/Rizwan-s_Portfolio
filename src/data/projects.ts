@@ -31,8 +31,88 @@ export interface Project {
 
 export const projects: Project[] = [
   {
-    slug: "ai-smart-attendance-tracking-system",
+    slug: "rag-powered-pdf-question-answering-system",
     number: "01",
+    title: "RAG-Powered PDF Question Answering System",
+    category: "Generative AI · RAG · LLM",
+    shortDescription:
+      "Built a Retrieval-Augmented Generation (RAG) application for querying PDF documents using LangChain, FAISS, HuggingFace embeddings, and Groq-hosted OpenAI GPT-OSS 20B. The system provides grounded answers with source and page citations and supports multiple PDF documents.",
+    fullDescription:
+      "Built a production-ready RAG pipeline using LangChain, FAISS, HuggingFace embeddings, and Groq-hosted OpenAI GPT-OSS 20B. The system processes multi-document PDF uploads, creates a FAISS vector index from semantic embeddings, retrieves relevant context via similarity search, and generates grounded answers with source filename and page citations — all through a Streamlit interface deployed to Streamlit Cloud.",
+    techStack: [
+      "Python",
+      "Streamlit",
+      "LangChain",
+      "FAISS",
+      "HuggingFace",
+      "Groq",
+      "GPT-OSS 20B",
+      "RAG",
+    ],
+    metrics: [
+      { value: "Multi-PDF", label: "Document Support" },
+      { value: "FAISS", label: "Vector Similarity Search" },
+      { value: "Groq", label: "LLM Inference Engine" },
+      { value: "↓ Hallucinations", label: "Via Retrieval Grounding" },
+    ],
+    problem:
+      "Large PDF documents are difficult to query efficiently. Users need to manually read through pages to find relevant information, and generic LLMs produce hallucinated answers when queried about specific documents without grounded context.",
+    solution:
+      "Implemented a RAG architecture that grounds LLM responses in retrieved document content. PDFs are chunked, embedded into a FAISS vector store, and queried via similarity search — ensuring the Groq-hosted GPT-OSS 20B model only generates answers based on verified, retrieved context from the uploaded documents, with source filename and page citations for every response.",
+    architecture: [
+      "PDF Ingestion — multi-PDF upload and text extraction via LangChain PDF loaders.",
+      "Document Chunking — recursive text splitting with configurable chunk size and overlap.",
+      "Semantic Embeddings — HuggingFace sentence-transformers model generates dense vector representations.",
+      "FAISS Vector Store — indexes all chunk embeddings for fast approximate nearest-neighbor search.",
+      "Similarity Search — retrieves the top-k most semantically relevant chunks per query.",
+      "Prompt Engineering — constructs a grounded context prompt combining retrieved chunks and user question.",
+      "Groq + GPT-OSS 20B — generates context-aware, hallucination-reduced responses via Groq inference API.",
+      "Streamlit UI — interactive interface deployed to Streamlit Cloud with real-time response and source citations.",
+    ],
+    features: [
+      "PDF document upload — multi-PDF support within a single session.",
+      "Question answering over PDF content via natural language queries.",
+      "Retrieval-Augmented Generation (RAG) pipeline grounding all answers in document context.",
+      "HuggingFace embeddings for high-quality semantic vector representations.",
+      "FAISS similarity search for fast retrieval of the most relevant document chunks.",
+      "Groq-hosted OpenAI GPT-OSS 20B for fast, context-driven answer generation.",
+      "Grounded answers — model responses constrained to retrieved document content only.",
+      "Source filename and page citations provided with every answer.",
+      "Multiple PDF support — query across several documents simultaneously.",
+      "Streamlit deployment — live on Streamlit Cloud.",
+    ],
+    challenges: [
+      {
+        challenge: "Preventing LLM hallucinations when document context is insufficient.",
+        solution:
+          "Implemented strict prompt constraints instructing the model to acknowledge when context is insufficient, rather than generating unsupported answers.",
+      },
+      {
+        challenge: "Maintaining semantic coherence across document chunk boundaries.",
+        solution:
+          "Applied overlapping chunking strategy to preserve context continuity at chunk edges, reducing answer fragmentation.",
+      },
+      {
+        challenge: "Optimizing retrieval relevance for diverse query types.",
+        solution:
+          "Tuned chunk size, overlap, and top-k retrieval parameters through experimentation to balance precision and recall across varied query styles.",
+      },
+    ],
+    results: [
+      "Built a fully functional end-to-end RAG pipeline supporting multi-document PDF question answering.",
+      "Reduced LLM hallucinations through retrieval grounding and prompt engineering.",
+      "Delivered source filename and page citations with every generated answer.",
+      "Deployed a live Streamlit application accessible at rag-powered-pdf-app-system.streamlit.app.",
+      "Implemented context-preserving chunking strategy improving answer coherence across chunk boundaries.",
+    ],
+    githubUrl: "https://github.com/Rizn76/RAG-Powered-PDF-QA-System",
+    demoUrl: "https://rag-powered-pdf-app-system.streamlit.app/",
+    imageUrl: "/images/project-rag.png",
+    featured: true,
+  },
+  {
+    slug: "ai-smart-attendance-tracking-system",
+    number: "02",
     title: "AI-Smart Attendance Tracking System",
     category: "Computer Vision · AI Application",
     shortDescription:
@@ -102,87 +182,9 @@ export const projects: Project[] = [
       "Improved deployment stability by resolving dependency and environment issues.",
       "Built a fully operational system with CSV export and analytics tracking.",
     ],
-    githubUrl: "https://github.com/Rizn76/ai-attendance-system", // PLACEHOLDER — replace with your exact repo URL, e.g. https://github.com/Rizn76/your-repo-name
-    demoUrl: "",  // PLACEHOLDER — add live demo URL if available
-    imageUrl: "/images/project-attendance.png", // PLACEHOLDER — add your screenshot here
-    featured: true,
-  },
-  {
-    slug: "rag-powered-pdf-question-answering-system",
-    number: "02",
-    title: "RAG-Powered PDF Question Answering System",
-    category: "Generative AI · RAG · LLM",
-    shortDescription:
-      "An end-to-end Retrieval-Augmented Generation pipeline that enables users to ask natural language questions across multiple PDF documents and receive context-grounded answers.",
-    fullDescription:
-      "Built a production-ready RAG pipeline using LangChain, FAISS, Hugging Face Embeddings, and Google Gemini 2.5 Flash. The system processes multi-document PDF uploads, creates a FAISS vector index from semantic embeddings, retrieves relevant context via similarity search, and generates grounded answers via Gemini — all through a Streamlit interface with chat history and source retrieval.",
-    techStack: [
-      "Python",
-      "LangChain",
-      "FAISS",
-      "Hugging Face Embeddings",
-      "Google Gemini 2.5 Flash",
-      "Streamlit",
-      "Git",
-      "GitHub",
-    ],
-    metrics: [
-      { value: "Multi-PDF", label: "Document Support" },
-      { value: "FAISS", label: "Vector Similarity Search" },
-      { value: "Gemini 2.5", label: "LLM Response Engine" },
-      { value: "↓ Hallucinations", label: "Via Retrieval Grounding" },
-    ],
-    problem:
-      "Large PDF documents are difficult to query efficiently. Users need to manually read through pages to find relevant information, and generic LLMs produce hallucinated answers when queried about specific documents without grounded context.",
-    solution:
-      "Implemented a RAG architecture that grounds LLM responses in retrieved document content. PDFs are chunked, embedded into a FAISS vector store, and queried via similarity search — ensuring Gemini only generates answers based on verified, retrieved context from the uploaded documents.",
-    architecture: [
-      "PDF Ingestion — multi-PDF upload and text extraction via LangChain PDF loaders.",
-      "Document Chunking — recursive text splitting with configurable chunk size and overlap.",
-      "Semantic Embeddings — Hugging Face sentence-transformers model generates dense vector representations.",
-      "FAISS Vector Store — indexes all chunk embeddings for fast approximate nearest-neighbor search.",
-      "Similarity Search — retrieves the top-k most semantically relevant chunks per query.",
-      "Prompt Engineering — constructs a grounded context prompt combining retrieved chunks and user question.",
-      "Gemini 2.5 Flash — generates context-aware, hallucination-reduced responses.",
-      "Streamlit UI — interactive interface with chat history, source display, and real-time response streaming.",
-    ],
-    features: [
-      "Multi-PDF upload and processing within a single session.",
-      "Recursive document chunking with configurable overlap for context preservation.",
-      "Hugging Face embeddings for high-quality semantic vector representations.",
-      "FAISS vector index for fast similarity search across all document chunks.",
-      "Google Gemini 2.5 Flash integration for context-driven answer generation.",
-      "Chat history maintaining conversational context across multiple questions.",
-      "Source chunk retrieval showing exactly which document sections informed each answer.",
-      "Prompt engineering to reduce hallucinations and improve answer relevance.",
-    ],
-    challenges: [
-      {
-        challenge: "Preventing LLM hallucinations when document context is insufficient.",
-        solution:
-          "Implemented strict prompt constraints instructing the model to acknowledge when context is insufficient, rather than generating unsupported answers.",
-      },
-      {
-        challenge: "Maintaining semantic coherence across document chunk boundaries.",
-        solution:
-          "Applied overlapping chunking strategy to preserve context continuity at chunk edges, reducing answer fragmentation.",
-      },
-      {
-        challenge: "Optimizing retrieval relevance for diverse query types.",
-        solution:
-          "Tuned chunk size, overlap, and top-k retrieval parameters through experimentation to balance precision and recall across varied query styles.",
-      },
-    ],
-    results: [
-      "Built a fully functional end-to-end RAG pipeline supporting multi-document PDF question answering.",
-      "Reduced LLM hallucinations through retrieval grounding and prompt engineering.",
-      "Delivered an interactive Streamlit interface with multi-PDF support, chat history, and source retrieval.",
-      "Implemented context-preserving chunking strategy improving answer coherence.",
-      "Successfully integrated Google Gemini 2.5 Flash for production-quality response generation.",
-    ],
-    githubUrl: "https://github.com/Rizn76/rag-pdf-qa", // PLACEHOLDER — replace with your exact repo URL, e.g. https://github.com/Rizn76/your-repo-name
-    demoUrl: "",  // PLACEHOLDER — add live demo URL if available
-    imageUrl: "/images/project-rag.png", // PLACEHOLDER — add your screenshot here
+    githubUrl: "https://github.com/Rizn76/ai-attendance-system",
+    demoUrl: "",
+    imageUrl: "/images/project-attendance.png",
     featured: true,
   },
 ];

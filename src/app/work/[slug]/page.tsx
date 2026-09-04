@@ -157,15 +157,14 @@ export default function CaseStudyPage({ params }: PageProps) {
         </div>
       </section>
 
-      {/* ── Project visual placeholder ── */}
+      {/* ── Project visual ── */}
       <section aria-label="Project preview" className="bg-surface">
         <div className="container-portfolio py-16 md:py-20">
           <AnimatedSection>
             <div
               className="relative w-full rounded-2xl overflow-hidden border border-border bg-background"
-              aria-label={`${project.title} — screenshot placeholder`}
+              aria-label={`${project.title} — project architecture diagram`}
             >
-              {/* Visual placeholder — replace with <Image> once you have screenshots */}
               <div className="w-full aspect-[16/8] flex flex-col items-center justify-center gap-6 p-8 md:p-12">
                 {project.slug === "rag-powered-pdf-question-answering-system" ? (
                   /* RAG Architecture diagram */
@@ -175,11 +174,11 @@ export default function CaseStudyPage({ params }: PageProps) {
                       {[
                         { label: "PDF Documents", icon: "📄" },
                         { label: "Chunking", icon: "✂️" },
-                        { label: "Embeddings", icon: "🔢" },
+                        { label: "HuggingFace Embeddings", icon: "🔢" },
                         { label: "FAISS Index", icon: "🗂️" },
-                        { label: "Retrieval", icon: "🔍" },
-                        { label: "Gemini LLM", icon: "🤖" },
-                        { label: "Answer", icon: "💬" },
+                        { label: "Similarity Search", icon: "🔍" },
+                        { label: "Groq · GPT-OSS 20B", icon: "🤖" },
+                        { label: "Answer + Citations", icon: "💬" },
                       ].map((step, i, arr) => (
                         <div key={step.label} className="flex md:flex-row flex-col items-center">
                           <div className="flex flex-col items-center p-3 rounded-xl bg-surface border border-border min-w-[90px] text-center">
@@ -222,9 +221,6 @@ export default function CaseStudyPage({ params }: PageProps) {
                     </div>
                   </div>
                 )}
-                <p className="text-xs text-subtle/60 mt-4">
-                  Replace this placeholder with your actual project screenshot
-                </p>
               </div>
             </div>
           </AnimatedSection>

@@ -89,6 +89,25 @@ export default function ProjectCard({ project, index }: ProjectCardProps) {
                 <path d="M5 12h14M12 5l7 7-7 7" />
               </svg>
             </Link>
+            {project.demoUrl && (
+              <>
+                <span className="w-px h-4 bg-border" aria-hidden="true" />
+                <a
+                  href={project.demoUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 text-sm text-muted hover:text-foreground transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded-sm"
+                  aria-label={`Live demo for ${project.title} (opens in new tab)`}
+                >
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6" />
+                    <polyline points="15 3 21 3 21 9" />
+                    <line x1="10" y1="14" x2="21" y2="3" />
+                  </svg>
+                  Live Demo
+                </a>
+              </>
+            )}
             {project.githubUrl && (
               <>
                 <span className="w-px h-4 bg-border" aria-hidden="true" />
@@ -137,11 +156,11 @@ export default function ProjectCard({ project, index }: ProjectCardProps) {
                     {[
                       "PDF Documents",
                       "Document Chunking",
-                      "Embeddings",
+                      "HuggingFace Embeddings",
                       "FAISS Vector Store",
                       "Similarity Search",
-                      "Gemini LLM",
-                      "Context-Aware Answer",
+                      "Groq · GPT-OSS 20B",
+                      "Grounded Answer + Citations",
                     ].map((step, i, arr) => (
                       <div key={step} className="flex flex-col items-center w-full">
                         <div className="w-full px-4 py-2 rounded-lg bg-background border border-border text-center text-xs font-medium text-foreground">
@@ -183,10 +202,7 @@ export default function ProjectCard({ project, index }: ProjectCardProps) {
               <div className="absolute inset-0 bg-foreground/0 group-hover/img:bg-foreground/[0.03] transition-colors duration-300" />
             </div>
 
-            {/* Image replacement notice — visible in dev */}
-            <div className="absolute bottom-3 right-3 text-[10px] text-subtle/60 bg-background/80 px-2 py-0.5 rounded-full">
-              Replace with screenshot
-            </div>
+
           </Link>
         </div>
       </div>

@@ -20,6 +20,6 @@ export const siteConfig = {
   // ── Resume ────────────────────────────────────────────────────────────────
   // Place your resume PDF at: public/resume.pdf
   // The download filename shown to the user:
-  resumeDownloadName: "Mohammed_Rizwan_AI_ML_Engineer_Resume.pdf",
+  resumeDownloadName: "Mohammed_Rizwan_Resume.pdf",
   resumePath: "/resume.pdf",
 } as const;

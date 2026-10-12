@@ -21,7 +21,7 @@ const manrope = Manrope({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://mohammedrizwan.dev"), // PLACEHOLDER — replace with your actual domain
+  metadataBase: new URL("https://rizwan-s-portfolio-nine.vercel.app"),
   title: {
     default: "Mohammed Rizwan | AI/ML Engineer",
     template: "%s | Mohammed Rizwan",
@@ -41,12 +41,12 @@ export const metadata: Metadata = {
     "Mohammed Rizwan",
     "Portfolio",
   ],
-  authors: [{ name: "Mohammed Rizwan", url: "https://mohammedrizwan.dev" }],
+  authors: [{ name: "Mohammed Rizwan", url: "https://rizwan-s-portfolio-nine.vercel.app" }],
   creator: "Mohammed Rizwan",
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://mohammedrizwan.dev",
+    url: "https://rizwan-s-portfolio-nine.vercel.app",
     siteName: "Mohammed Rizwan",
     title: "Mohammed Rizwan | AI/ML Engineer",
     description:

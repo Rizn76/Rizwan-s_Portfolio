@@ -7,12 +7,6 @@ export interface Certification {
 
 export const certifications: Certification[] = [
   {
-    id: "datavalley",
-    title: "AI/ML Engineer Internship Programme",
-    issuer: "Datavalley",
-    category: "AI / Machine Learning",
-  },
-  {
     id: "aviatrix",
     title: "Aviatrix Certified Engineer — Multi-Cloud Networking Associate",
     issuer: "Aviatrix",

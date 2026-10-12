@@ -7,15 +7,15 @@ export const siteConfig = {
   title: "Mohammed Rizwan | AI/ML Engineer",
   description:
     "AI/ML Engineer building Machine Learning, Generative AI, RAG, LLM-powered applications, semantic search, and intelligent data solutions using Python.",
-  url: "https://mohammedrizwan.dev", // PLACEHOLDER — replace with your actual domain
+  url: "https://rizwan-s-portfolio-nine.vercel.app",
 
   email: "mdrmohammedrizwan@gmail.com",
   phone: "+91 9550000219",
 
   // ── Social links ──────────────────────────────────────────────────────────
   github: "https://github.com/Rizn76",
-  linkedin: "https://www.linkedin.com/in/mdmohammedrizwan/", // PLACEHOLDER — replace with your LinkedIn profile URL
-  hackerrank: "https://www.hackerrank.com/profile/MDRIZWAN72", // PLACEHOLDER — replace with your HackerRank profile URL
+  linkedin: "https://www.linkedin.com/in/mdmohammedrizwan/",
+  hackerrank: "https://www.hackerrank.com/profile/MDRIZWAN72",
 
   // ── Resume ────────────────────────────────────────────────────────────────
   // Place your resume PDF at: public/resume.pdf

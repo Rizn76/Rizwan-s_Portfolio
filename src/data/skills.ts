@@ -11,6 +11,8 @@ export const skillCategories: SkillCategory[] = [
     skills: [
       "Supervised Learning",
       "Unsupervised Learning",
+      "Classification",
+      "Regression",
       "Feature Engineering",
       "Model Evaluation",
       "Scikit-learn",
@@ -23,7 +25,8 @@ export const skillCategories: SkillCategory[] = [
       "LLMs",
       "Retrieval-Augmented Generation",
       "LangChain",
-      "LlamaIndex",
+      "Groq",
+      "LLM APIs",
       "Prompt Engineering",
       "Semantic Search",
     ],
@@ -41,7 +44,7 @@ export const skillCategories: SkillCategory[] = [
   {
     id: "analytics",
     title: "Data Analytics",
-    skills: ["EDA", "Data Cleaning", "ETL", "Data Modeling", "KPI Definition"],
+    skills: ["EDA", "Data Cleaning", "ETL", "Data Modeling"],
   },
   {
     id: "visualization",
@@ -51,6 +54,6 @@ export const skillCategories: SkillCategory[] = [
   {
     id: "cloud",
     title: "Cloud & Tools",
-    skills: ["AWS", "Git", "GitHub", "VS Code", "Jupyter Notebook", "MySQL Workbench", "Streamlit"],
+    skills: ["AWS", "Git", "GitHub", "CI/CD Pipelines", "Streamlit", "VS Code", "Jupyter Notebook", "MySQL Workbench"],
   },
 ];

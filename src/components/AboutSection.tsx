@@ -8,7 +8,6 @@ const interests = [
   "Generative AI",
   "RAG Systems",
   "LLM Applications",
-  "AI Agents",
   "Semantic Search",
   "Computer Vision",
   "AI Product Building",

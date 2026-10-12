@@ -73,12 +73,11 @@ export default function ResumePage() {
               </div>
               <div className="lg:col-span-9">
                 <p className="text-base text-muted leading-relaxed text-pretty">
-                  AI/ML Engineer with hands-on experience developing Machine Learning models, Retrieval-Augmented
-                  Generation (RAG) applications, LLM-powered intelligent systems, and AI analytics solutions using
-                  Python, Scikit-learn, LangChain, FAISS, SQL, and AWS. Built end-to-end AI applications involving
-                  data preprocessing, feature engineering, semantic search, vector databases, and application
-                  deployment using Streamlit. Strong foundation in Generative AI, Machine Learning, Data Analytics,
-                  and backend AI workflows with experience delivering scalable, business-oriented AI solutions.
+                  AI/ML Engineer with hands-on experience developing Generative AI and Machine Learning applications
+                  using Python, LLMs, RAG, LangChain, FAISS, and Hugging Face. Experienced in building end-to-end
+                  RAG pipelines, semantic search, and LLM integrations. Developed LLM-powered AI applications with
+                  multi-document processing, source citations, and Streamlit interfaces. Strong foundation in
+                  Generative AI, AI application development, Machine Learning, and cloud technologies.
                 </p>
                 <div className="mt-5 flex flex-wrap gap-3">
                   <a href={`mailto:${siteConfig.email}`} className="text-sm text-muted hover:text-foreground transition-colors duration-200">

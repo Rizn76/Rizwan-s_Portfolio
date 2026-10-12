@@ -26,7 +26,7 @@ export const experience: ExperienceItem[] = [
       "Building Machine Learning models, evaluating LLM prompt strategies, and automating AI-driven data workflows in an Agile cross-functional team environment.",
     highlights: [
       "Processed 20,000+ records using Pandas and NumPy, reducing missing values by 30% before model training.",
-      "Built classification models using Logistic Regression and Random Forest achieving 85% validation accuracy.",
+      "Built classification models using Logistic Regression and Random Forest achieving 85% validation accuracy while improving prediction consistency.",
       "Developed and evaluated 15+ zero-shot, few-shot, and chain-of-thought prompt templates to improve structured information extraction from unstructured data.",
       "Evaluated model performance using Accuracy, Precision, Recall, and F1-score — achieved a 15% improvement in F1-score through feature engineering and model optimization.",
       "Automated Python-based ML workflows integrated with LLM APIs and automated reporting pipelines, reducing manual effort by 40%.",
@@ -51,9 +51,9 @@ export const experience: ExperienceItem[] = [
       "Reviewed and validated Google Ads at scale in a high-volume quality-focused environment, maintaining outstanding accuracy and contributing to process optimization initiatives.",
     highlights: [
       "Reviewed and validated 200+ Google Ads daily while maintaining 98% policy compliance accuracy and consistently meeting SLA requirements.",
-      "Analyzed ad creatives and advertiser cases to identify policy violations and operational issues, using Excel to track performance trends and productivity metrics.",
+      "Analyzed ad creatives and advertiser cases to identify policy violations and operational issues, using Excel reports to track performance trends and productivity metrics.",
       "Resolved advertiser issues through direct handling and timely escalation workflows, ensuring smooth operations and policy adherence.",
-      "Achieved a 99% QA score and exceeded turnaround targets by 15%.",
+      "Monitored productivity metrics and adapted to evolving policy workflows, achieved 99% QA score and exceeding turnaround targets by 15%.",
       "Delivered data-driven insights supporting process optimization, reducing recurring operational issues by 22%.",
       "Consistently met 100% monthly performance KPIs across a high-volume data review environment.",
     ],

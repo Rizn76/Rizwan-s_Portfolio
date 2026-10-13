@@ -35,7 +35,7 @@ npm install
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser.
+Open [http://localhost:3000](https://rizwan-s-portfolio-nine.vercel.app/) in your browser.
 
 ---
 

@@ -3,6 +3,7 @@ import { Inter, Manrope } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import FloatingAssistant from "@/components/FloatingAssistant";
 import { siteConfig } from "@/lib/siteConfig";
 
 // Load fonts via next/font — correct App Router pattern, no ESLint warnings
@@ -127,6 +128,7 @@ export default function RootLayout({
           {children}
         </main>
         <Footer />
+        <FloatingAssistant />
       </body>
     </html>
   );

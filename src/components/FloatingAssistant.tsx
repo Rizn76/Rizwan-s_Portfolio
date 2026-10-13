@@ -17,35 +17,145 @@ interface Message {
   content: string;
 }
 
-/* ── Robot avatar — used in launcher and chat header ────────────────────── */
-function AvatarImg({
-  size,
-  className = "",
-}: {
-  size: number;
-  className?: string;
-}) {
-  const [imgError, setImgError] = useState(false);
+/* ── Lightweight inline Markdown renderer ───────────────────────────────── */
+/*
+ * Handles the subset that Groq actually produces:
+ *   **bold**, *italic*, ### Heading, - bullet, 1. numbered, [text](url)
+ * Zero external dependencies. Output is sanitised — only safe elements.
+ */
+function renderInline(text: string): React.ReactNode[] {
+  // Pattern order matters: bold before italic, links before plain text
+  const parts = text.split(/(\*\*[^*]+\*\*|\*[^*]+\*|\[[^\]]+\]\([^)]+\))/g);
+  return parts.map((part, i) => {
+    if (/^\*\*[^*]+\*\*$/.test(part)) {
+      return <strong key={i}>{part.slice(2, -2)}</strong>;
+    }
+    if (/^\*[^*]+\*$/.test(part)) {
+      return <em key={i}>{part.slice(1, -1)}</em>;
+    }
+    const linkMatch = part.match(/^\[([^\]]+)\]\(([^)]+)\)$/);
+    if (linkMatch) {
+      return (
+        <a
+          key={i}
+          href={linkMatch[2]}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline text-accent hover:text-accent/80 break-words"
+        >
+          {linkMatch[1]}
+        </a>
+      );
+    }
+    return <span key={i}>{part}</span>;
+  });
+}
 
+function MarkdownMessage({ content }: { content: string }) {
+  const lines = content.split("\n");
+  const elements: React.ReactNode[] = [];
+  let listItems: string[] = [];
+  let listType: "ul" | "ol" | null = null;
+  let key = 0;
+
+  const flushList = () => {
+    if (!listItems.length) return;
+    if (listType === "ul") {
+      elements.push(
+        <ul key={key++} className="list-disc list-outside space-y-0.5 my-1 pl-4">
+          {listItems.map((item, i) => (
+            <li key={i} className="text-[13px] leading-relaxed break-words">
+              {renderInline(item)}
+            </li>
+          ))}
+        </ul>
+      );
+    } else {
+      elements.push(
+        <ol key={key++} className="list-decimal list-outside space-y-0.5 my-1 pl-4">
+          {listItems.map((item, i) => (
+            <li key={i} className="text-[13px] leading-relaxed break-words">
+              {renderInline(item)}
+            </li>
+          ))}
+        </ol>
+      );
+    }
+    listItems = [];
+    listType = null;
+  };
+
+  for (const rawLine of lines) {
+    const line = rawLine.trimEnd();
+
+    // Heading: ### or ## or #
+    const headingMatch = line.match(/^(#{1,3})\s+(.+)$/);
+    if (headingMatch) {
+      flushList();
+      const level = headingMatch[1].length;
+      const cls =
+        level === 1
+          ? "text-[14px] font-bold mt-2 mb-0.5"
+          : level === 2
+          ? "text-[13px] font-bold mt-2 mb-0.5"
+          : "text-[13px] font-semibold mt-1.5 mb-0.5";
+      elements.push(
+        <p key={key++} className={cls}>
+          {renderInline(headingMatch[2])}
+        </p>
+      );
+      continue;
+    }
+
+    // Bullet list: - item or * item or • item
+    const bulletMatch = line.match(/^[-*•]\s+(.+)$/);
+    if (bulletMatch) {
+      if (listType === "ol") flushList();
+      listType = "ul";
+      listItems.push(bulletMatch[1]);
+      continue;
+    }
+
+    // Numbered list: 1. item
+    const numberedMatch = line.match(/^\d+\.\s+(.+)$/);
+    if (numberedMatch) {
+      if (listType === "ul") flushList();
+      listType = "ol";
+      listItems.push(numberedMatch[1]);
+      continue;
+    }
+
+    // Empty line: flush pending list, add spacer
+    if (line === "") {
+      flushList();
+      elements.push(<div key={key++} className="h-1.5" aria-hidden="true" />);
+      continue;
+    }
+
+    // Regular paragraph line
+    flushList();
+    elements.push(
+      <p key={key++} className="text-[13px] leading-relaxed break-words">
+        {renderInline(line)}
+      </p>
+    );
+  }
+
+  flushList(); // flush any trailing list
+  return <div className="space-y-0.5">{elements}</div>;
+}
+
+/* ── Robot avatar ────────────────────────────────────────────────────────── */
+function AvatarImg({ size, className = "" }: { size: number; className?: string }) {
+  const [imgError, setImgError] = useState(false);
   if (imgError) {
-    /* Fallback: clean robot SVG in a dark circle */
     return (
       <div
         className={`relative rounded-full overflow-hidden flex-shrink-0 bg-foreground flex items-center justify-center ${className}`}
         style={{ width: size, height: size }}
         aria-label="Rizwan's AI Portfolio Assistant"
       >
-        <svg
-          width={size * 0.55}
-          height={size * 0.55}
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="white"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          aria-hidden="true"
-        >
+        <svg width={size * 0.55} height={size * 0.55} viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
           <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
           <path d="M7 11V7a5 5 0 0 1 10 0v4" />
           <circle cx="12" cy="16" r="1" fill="white" stroke="none" />
@@ -53,12 +163,8 @@ function AvatarImg({
       </div>
     );
   }
-
   return (
-    <div
-      className={`relative rounded-xl overflow-hidden flex-shrink-0 bg-white ${className}`}
-      style={{ width: size, height: size }}
-    >
+    <div className={`relative rounded-xl overflow-hidden flex-shrink-0 bg-white ${className}`} style={{ width: size, height: size }}>
       <Image
         src="/assistant-avatar.png"
         alt="Rizwan's AI Portfolio Assistant"
@@ -75,18 +181,9 @@ function AvatarImg({
 /* ── Loading dots ────────────────────────────────────────────────────────── */
 function TypingDots() {
   return (
-    <div
-      className="flex items-center gap-1 px-4 py-3"
-      aria-label="Assistant is typing"
-      aria-live="polite"
-    >
+    <div className="flex items-center gap-1 px-4 py-3" aria-label="Assistant is typing" aria-live="polite">
       {[0, 1, 2].map((i) => (
-        <span
-          key={i}
-          className="w-1.5 h-1.5 rounded-full bg-muted animate-bounce"
-          style={{ animationDelay: `${i * 150}ms` }}
-          aria-hidden="true"
-        />
+        <span key={i} className="w-1.5 h-1.5 rounded-full bg-muted animate-bounce" style={{ animationDelay: `${i * 150}ms` }} aria-hidden="true" />
       ))}
     </div>
   );
@@ -95,17 +192,7 @@ function TypingDots() {
 /* ── Send icon ──────────────────────────────────────────────────────────── */
 function SendIcon() {
   return (
-    <svg
-      width="13"
-      height="13"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <line x1="22" y1="2" x2="11" y2="13" />
       <polygon points="22 2 15 22 11 13 2 9 22 2" />
     </svg>
@@ -120,30 +207,33 @@ export default function FloatingAssistant() {
   const [loading, setLoading]   = useState(false);
   const [error, setError]       = useState<string | null>(null);
   const [lastMsg, setLastMsg]   = useState<string | null>(null);
-  /* Show tooltip after short delay on first load */
   const [showTooltip, setShowTooltip] = useState(false);
-  /* Track if launcher avatar image failed */
   const [launcherImgError, setLauncherImgError] = useState(false);
 
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const inputRef  = useRef<HTMLTextAreaElement>(null);
-  const panelRef  = useRef<HTMLDivElement>(null);
-  const panelId   = useId();
-  const launchId  = useId();
+  const scrollRef   = useRef<HTMLDivElement>(null);
+  const inputRef    = useRef<HTMLTextAreaElement>(null);
+  const panelRef    = useRef<HTMLDivElement>(null);
+  /* Track the message count at last scroll so we only auto-scroll on new messages */
+  const prevCountRef = useRef(0);
+  const panelId = useId();
+  const launchId = useId();
 
-  /* Tooltip entrance — appears once after 1.5 s, fades if panel opens */
+  /* Tooltip: appears after 1.5 s, hides when panel opens */
   useEffect(() => {
     const t = setTimeout(() => setShowTooltip(true), 1500);
     return () => clearTimeout(t);
   }, []);
-  useEffect(() => {
-    if (open) setShowTooltip(false);
-  }, [open]);
+  useEffect(() => { if (open) setShowTooltip(false); }, [open]);
 
-  /* Auto-scroll */
+  /* Auto-scroll ONLY when a new message is added (not on every re-render) */
   useEffect(() => {
-    if (scrollRef.current)
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    const currentCount = messages.length + (loading ? 1 : 0);
+    if (currentCount > prevCountRef.current) {
+      prevCountRef.current = currentCount;
+      if (scrollRef.current) {
+        scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+      }
+    }
   }, [messages, loading]);
 
   /* Focus input on open */
@@ -154,9 +244,7 @@ export default function FloatingAssistant() {
   /* Escape closes panel */
   useEffect(() => {
     if (!open) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setOpen(false);
-    };
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setOpen(false); };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [open]);
@@ -168,74 +256,41 @@ export default function FloatingAssistant() {
       if (panelRef.current && !panelRef.current.contains(e.target as Node))
         setOpen(false);
     };
-    const t = setTimeout(
-      () => document.addEventListener("mousedown", onClick),
-      100
-    );
-    return () => {
-      clearTimeout(t);
-      document.removeEventListener("mousedown", onClick);
-    };
+    const t = setTimeout(() => document.addEventListener("mousedown", onClick), 100);
+    return () => { clearTimeout(t); document.removeEventListener("mousedown", onClick); };
   }, [open]);
 
   /* Send message */
-  const sendMessage = useCallback(
-    async (text: string) => {
-      const trimmed = text.trim();
-      if (!trimmed || loading) return;
-
-      setError(null);
-      setLastMsg(trimmed);
-      setInput("");
-
-      const userMsg: Message = {
-        id: crypto.randomUUID(),
-        role: "user",
-        content: trimmed,
-      };
-      setMessages((prev) => [...prev, userMsg]);
-      setLoading(true);
-
-      try {
-        const history = messages.map((m) => ({
-          role: m.role,
-          content: m.content,
-        }));
-        const res = await fetch("/api/chat", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ message: trimmed, history }),
-        });
-        const data = await res.json();
-        if (!res.ok || data.error)
-          throw new Error(data.error ?? "Something went wrong.");
-
-        setMessages((prev) => [
-          ...prev,
-          { id: crypto.randomUUID(), role: "assistant", content: data.reply },
-        ]);
-      } catch (err) {
-        setError(
-          err instanceof Error ? err.message : "An unexpected error occurred."
-        );
-        setMessages((prev) => prev.filter((m) => m.id !== userMsg.id));
-      } finally {
-        setLoading(false);
-      }
-    },
-    [loading, messages]
-  );
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    sendMessage(input);
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      sendMessage(input);
+  const sendMessage = useCallback(async (text: string) => {
+    const trimmed = text.trim();
+    if (!trimmed || loading) return;
+    setError(null);
+    setLastMsg(trimmed);
+    setInput("");
+    const userMsg: Message = { id: crypto.randomUUID(), role: "user", content: trimmed };
+    setMessages((prev) => [...prev, userMsg]);
+    setLoading(true);
+    try {
+      const history = messages.map((m) => ({ role: m.role, content: m.content }));
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: trimmed, history }),
+      });
+      const data = await res.json();
+      if (!res.ok || data.error) throw new Error(data.error ?? "Something went wrong.");
+      setMessages((prev) => [...prev, { id: crypto.randomUUID(), role: "assistant", content: data.reply }]);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "An unexpected error occurred.");
+      setMessages((prev) => prev.filter((m) => m.id !== userMsg.id));
+    } finally {
+      setLoading(false);
     }
+  }, [loading, messages]);
+
+  const handleSubmit = (e: React.FormEvent) => { e.preventDefault(); sendMessage(input); };
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(input); }
   };
 
   const isEmpty = messages.length === 0 && !loading;
@@ -252,55 +307,46 @@ export default function FloatingAssistant() {
           aria-label="Portfolio assistant"
           className={[
             "fixed z-[9998]",
-            /* position: above launcher, anchored bottom-right */
-            /* safe-area-inset support via padding */
+            /* Desktop: above launcher, snapped to bottom-right */
+            /* Mobile: near-full-width, stays above safe-area */
             "bottom-[5.5rem] right-4 sm:right-6",
-            "w-[calc(100vw-2rem)] sm:w-[380px]",
-            "h-[520px] max-h-[80dvh]",
-            "flex flex-col",
-            "bg-background/95 backdrop-blur-xl",
+            "w-[calc(100vw-2rem)] sm:w-[420px]",
+            /* Height: fixed on desktop, viewport-constrained on mobile */
+            "h-[560px] max-h-[80dvh] min-h-0",
+            /* Rigid flex column so header + input never scroll */
+            "flex flex-col overflow-hidden",
+            /* Cream glass surface — explicit rgba avoids Tailwind opacity issues */
+            "bg-[rgba(247,245,242,0.98)] backdrop-blur-xl",
             "border border-border",
             "rounded-2xl shadow-2xl",
             "animate-fade-up",
           ].join(" ")}
         >
-          {/* Header */}
-          <div className="flex items-center gap-3 px-4 py-3.5 border-b border-border flex-shrink-0">
-            <AvatarImg size={32} />
+          {/* ── Header (fixed, never scrolls) ── */}
+          <div className="flex items-center gap-3 px-4 py-3 border-b border-border flex-shrink-0 bg-[rgba(247,245,242,0.95)]">
+            <AvatarImg size={34} />
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-foreground leading-tight">
+              <p className="text-sm font-semibold text-foreground leading-tight truncate">
                 Rizwan&apos;s Portfolio Assistant
               </p>
               <div className="flex items-center gap-1.5 mt-0.5">
-                <span
-                  className="w-1.5 h-1.5 rounded-full bg-green-500"
-                  aria-hidden="true"
-                />
+                <span className="w-1.5 h-1.5 rounded-full bg-green-500" aria-hidden="true" />
                 <span className="text-[10px] text-muted">Ready to help</span>
               </div>
             </div>
             <button
               onClick={() => setOpen(false)}
-              className="w-7 h-7 flex items-center justify-center rounded-full text-muted hover:text-foreground hover:bg-surface transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent flex-shrink-0"
+              className="w-8 h-8 flex items-center justify-center rounded-full text-muted hover:text-foreground hover:bg-surface transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent flex-shrink-0"
               aria-label="Close assistant"
             >
-              <svg
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                aria-hidden="true"
-              >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" aria-hidden="true">
                 <line x1="18" y1="6" x2="6" y2="18" />
                 <line x1="6" y1="6" x2="18" y2="18" />
               </svg>
             </button>
           </div>
 
-          {/* Messages */}
+          {/* ── Scroll area (expands to fill remaining height) ── */}
           <div
             ref={scrollRef}
             className="flex-1 overflow-y-auto overscroll-contain px-4 py-3 space-y-3 min-h-0"
@@ -310,9 +356,8 @@ export default function FloatingAssistant() {
           >
             {isEmpty && (
               <div className="flex flex-col h-full items-center justify-center gap-4 py-4">
-                <p className="text-xs text-muted text-center leading-relaxed max-w-[240px]">
-                  Ask me about Rizwan&apos;s experience, skills, projects, or
-                  background.
+                <p className="text-xs text-muted text-center leading-relaxed max-w-[260px]">
+                  Ask me about Rizwan&apos;s experience, skills, projects, or background.
                 </p>
                 <div className="flex flex-col gap-2 w-full">
                   {SUGGESTED_QUESTIONS.map((q) => (
@@ -320,7 +365,7 @@ export default function FloatingAssistant() {
                       key={q}
                       onClick={() => sendMessage(q)}
                       disabled={loading}
-                      className="text-left text-xs px-3 py-2 rounded-lg border border-border text-muted hover:text-foreground hover:border-foreground/30 hover:bg-surface transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="text-left text-xs px-3.5 py-2.5 rounded-lg border border-border text-muted hover:text-foreground hover:border-foreground/30 hover:bg-surface transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {q}
                     </button>
@@ -330,32 +375,29 @@ export default function FloatingAssistant() {
             )}
 
             {messages.map((msg) => (
-              <div
-                key={msg.id}
-                className={`flex ${
-                  msg.role === "user" ? "justify-end" : "justify-start"
-                }`}
-              >
-                {msg.role === "assistant" && (
-                  <AvatarImg size={24} className="mt-0.5 mr-2" />
-                )}
+              <div key={msg.id} className={`flex items-start ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
+                {msg.role === "assistant" && <AvatarImg size={26} className="mt-0.5 mr-2 flex-shrink-0" />}
                 <div
                   className={[
-                    "max-w-[80%] rounded-2xl px-3.5 py-2.5 text-[13px] leading-relaxed whitespace-pre-wrap",
+                    /* max-w keeps bubbles readable; overflow-x-hidden stops horizontal bleed */
+                    "max-w-[84%] rounded-2xl px-4 py-2.5 overflow-x-hidden",
                     msg.role === "user"
-                      ? "bg-foreground text-background rounded-br-sm"
+                      ? "bg-foreground text-background rounded-br-sm text-[13px] leading-relaxed"
                       : "bg-surface border border-border text-foreground rounded-bl-sm",
                   ].join(" ")}
                   role={msg.role === "assistant" ? "article" : undefined}
                 >
-                  {msg.content}
+                  {msg.role === "assistant"
+                    ? <MarkdownMessage content={msg.content} />
+                    : <span className="whitespace-pre-wrap break-words">{msg.content}</span>
+                  }
                 </div>
               </div>
             ))}
 
             {loading && (
-              <div className="flex justify-start">
-                <AvatarImg size={24} className="mt-0.5 mr-2" />
+              <div className="flex justify-start items-start">
+                <AvatarImg size={26} className="mt-0.5 mr-2 flex-shrink-0" />
                 <div className="bg-surface border border-border rounded-2xl rounded-bl-sm">
                   <TypingDots />
                 </div>
@@ -364,8 +406,8 @@ export default function FloatingAssistant() {
 
             {error && (
               <div className="flex justify-center" role="alert">
-                <div className="bg-surface border border-border rounded-xl px-4 py-3 text-center max-w-xs">
-                  <p className="text-xs text-red-600 mb-2">{error}</p>
+                <div className="bg-surface border border-red-200 rounded-xl px-4 py-3 text-center max-w-[300px]">
+                  <p className="text-xs text-red-600 mb-2 break-words">{error}</p>
                   <button
                     onClick={() => lastMsg && sendMessage(lastMsg)}
                     className="text-xs font-semibold text-foreground underline hover:text-accent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded-sm"
@@ -377,10 +419,10 @@ export default function FloatingAssistant() {
             )}
           </div>
 
-          {/* Input */}
+          {/* ── Input (fixed, never scrolls) ── */}
           <form
             onSubmit={handleSubmit}
-            className="px-3 pb-3 pt-2 border-t border-border flex-shrink-0"
+            className="px-3 pb-3 pt-2 border-t border-border flex-shrink-0 bg-[rgba(247,245,242,0.95)]"
             aria-label="Send a message"
           >
             <div className="flex items-end gap-2 bg-surface border border-border rounded-xl px-3 py-2 focus-within:border-foreground/30 transition-colors duration-200">
@@ -393,7 +435,7 @@ export default function FloatingAssistant() {
                 maxLength={800}
                 rows={1}
                 disabled={loading}
-                className="flex-1 bg-transparent text-[13px] text-foreground placeholder:text-muted outline-none resize-none py-0.5 max-h-28 overflow-y-auto disabled:cursor-not-allowed"
+                className="flex-1 bg-transparent text-[13px] text-foreground placeholder:text-muted outline-none resize-none py-0.5 max-h-24 overflow-y-auto disabled:cursor-not-allowed"
                 aria-label="Type your message"
                 style={{ scrollbarWidth: "thin" }}
               />
@@ -413,64 +455,54 @@ export default function FloatingAssistant() {
         </div>
       )}
 
-      {/* ── Floating launcher ──────────────────────────────────────────── */}
+      {/* ── Floating launcher — hidden while chat is open ──────────────── */}
       {/*
-        z-[9999] ensures it sits above everything including the navbar (z-50).
-        No parent transform or overflow:hidden here — placed directly in
-        <body> via layout.tsx so position:fixed is always viewport-relative.
+        Completely hidden (not just invisible) when open=true.
+        This eliminates the duplicate X button at the bottom-right.
+        The panel's own header X is the sole close control.
       */}
-      <div
-        className="fixed z-[9999]"
-        style={{
-          bottom: "calc(1.5rem + env(safe-area-inset-bottom, 0px))",
-          right: "1.5rem",
-        }}
-      >
-        {/* "Ask my AI assistant" tooltip — fades in after 1.5 s, hides when chat opens */}
+      {!open && (
         <div
-          className={[
-            "absolute right-full mr-3 top-1/2 -translate-y-1/2",
-            "pointer-events-none whitespace-nowrap",
-            "transition-all duration-500",
-            showTooltip && !open
-              ? "opacity-100 translate-x-0"
-              : "opacity-0 translate-x-2",
-          ].join(" ")}
-          aria-hidden="true"
+          className="fixed z-[9999]"
+          style={{
+            bottom: "calc(1.5rem + env(safe-area-inset-bottom, 0px))",
+            right: "1.5rem",
+          }}
         >
-          <span className="inline-flex items-center gap-1.5 text-xs font-medium text-foreground bg-background border border-border rounded-full px-3 py-1.5 shadow-sm">
-            <span className="w-1.5 h-1.5 rounded-full bg-green-500 flex-shrink-0" />
-            Ask my AI assistant
-          </span>
-        </div>
+          {/* Tooltip */}
+          <div
+            className={[
+              "absolute right-full mr-3 top-1/2 -translate-y-1/2",
+              "pointer-events-none whitespace-nowrap",
+              "transition-all duration-500",
+              showTooltip ? "opacity-100 translate-x-0" : "opacity-0 translate-x-2",
+            ].join(" ")}
+            aria-hidden="true"
+          >
+            <span className="inline-flex items-center gap-1.5 text-xs font-medium text-foreground bg-background border border-border rounded-full px-3 py-1.5 shadow-sm">
+              <span className="w-1.5 h-1.5 rounded-full bg-green-500 flex-shrink-0" />
+              Ask my AI assistant
+            </span>
+          </div>
 
-        {/* Launcher button */}
-        <button
-          id={launchId}
-          onClick={() => setOpen((v) => !v)}
-          aria-expanded={open}
-          aria-controls={panelId}
-          aria-label={
-            open ? "Close portfolio assistant" : "Open portfolio assistant"
-          }
-          className={[
-            "relative w-16 h-16 rounded-2xl overflow-hidden",
-            "border-2 border-white/90",
-            "shadow-lg hover:shadow-xl",
-            "transition-all duration-300",
-            "hover:scale-110 active:scale-95",
-            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2",
-            "bg-white",
-          ].join(" ")}
-        >
-          {/* Robot avatar image — shown when panel is closed */}
-          <span
-            className={`absolute inset-0 transition-all duration-300 ${
-              open ? "opacity-0 scale-75" : "opacity-100 scale-100"
-            }`}
+          {/* Robot launcher button — shows only when chat is closed */}
+          <button
+            id={launchId}
+            onClick={() => setOpen(true)}
+            aria-label="Open portfolio assistant"
+            aria-controls={panelId}
+            className={[
+              "relative w-16 h-16 rounded-2xl overflow-hidden",
+              "border-2 border-white/90",
+              "shadow-lg hover:shadow-xl",
+              "transition-all duration-300",
+              "hover:scale-110 active:scale-95",
+              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2",
+              "bg-white",
+            ].join(" ")}
           >
             {launcherImgError ? (
-              <span className="w-full h-full flex items-center justify-center bg-foreground rounded-2xl">
+              <span className="absolute inset-0 flex items-center justify-center bg-foreground rounded-2xl">
                 <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                   <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
                   <path d="M7 11V7a5 5 0 0 1 10 0v4" />
@@ -488,30 +520,9 @@ export default function FloatingAssistant() {
                 onError={() => setLauncherImgError(true)}
               />
             )}
-          </span>
-
-          {/* Close X — shown when panel is open */}
-          <span
-            className={`absolute inset-0 flex items-center justify-center bg-foreground text-background transition-all duration-300 rounded-2xl ${
-              open ? "opacity-100 scale-100" : "opacity-0 scale-75"
-            }`}
-            aria-hidden="true"
-          >
-            <svg
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-            >
-              <line x1="18" y1="6" x2="6" y2="18" />
-              <line x1="6" y1="6" x2="18" y2="18" />
-            </svg>
-          </span>
-        </button>
-      </div>
+          </button>
+        </div>
+      )}
     </>
   );
 }
